@@ -47,3 +47,23 @@ def get_courses(skip: int = 0, limit: int = 10, service: CourseService = Depends
         return service.get_courses(skip, limit)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error Getting Courses: {e}")
+
+@router.get("/{course_id}", response_model=CourseDTO, status_code=status.HTTP_200_OK)
+def get_course_by_id(course_id:str, service: CourseService = Depends(get_course_service)):
+    """ 
+    Gets a transaction for a course by its ID.
+
+    **Params**:
+    - course_id: str => Course ID to search.
+
+    **Return**: The course found.
+    """
+    try:
+        course = service.get_course_by_id(course_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=f"Value Error: {e}")
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error Getting Course by ID: {e}")
+    if course:
+        return course
+    raise HTTPException(status_code=404, detail=f"Course with ID: {course_id} not found")

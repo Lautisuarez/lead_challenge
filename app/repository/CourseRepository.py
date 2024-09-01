@@ -137,3 +137,46 @@ class CourseRepository:
             raise e
         finally:
             self.db_manager.disconnect(connection)
+
+    def get_course_by_id(self, course_id: str) -> CourseDTO:
+        connection = self.db_manager.connect()
+        try:
+            with connection:
+                course = self.dao_course.get_course_by_id(connection, course_id)
+                if course:
+                    lead = self.dao_lead.get_lead_by_id(connection, course.lead_id)
+                    subject = self.dao_subject.get_by_id(connection, course.subject_id)
+                    career = self.dao_career.get_career_by_id(connection, subject.career_id)
+                    return CourseDTO(
+                        id=course.id,
+                        start_date=course.start_date,
+                        end_date=course.end_date,
+                        inscription_year=course.inscription_year,
+                        lead=LeadDTO(
+                            id=lead.id,
+                            name=lead.name,
+                            last_name=lead.last_name,
+                            email=lead.email,
+                            address=lead.address,
+                            phone=lead.phone
+                        ),
+                        subject=SubjectDTO(
+                            id=subject.id,
+                            name=subject.name,
+                            career=CareerDTO(
+                                id=career.id,
+                                name=career.name
+                            )
+                        )    
+                    )
+                return None
+        except (psycopg2.DatabaseError, psycopg2.IntegrityError) as db_error:
+            connection.rollback()
+            print(f"Database error occurred getting courses: {db_error}")
+            raise db_error
+        except Exception as e:
+            connection.rollback()
+            print(f"An unexpected error occurred: {e}")
+            raise e
+        finally:
+            self.db_manager.disconnect(connection)
