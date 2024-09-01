@@ -8,6 +8,7 @@ from app.models.Course import Course, CourseDTO
 from app.models.Lead import Lead, LeadDTO
 from app.models.Subject import Subject, SubjectDTO
 from app.models.Career import Career, CareerDTO
+from typing import List
 
 class CourseRepository:
     def __init__(self, db_manager: DatabaseManager, dao_course: CourseDAO, dao_lead: LeadDAO, dao_subject: SubjectDAO, dao_career: CareerDAO):
@@ -26,7 +27,7 @@ class CourseRepository:
 
     def _check_subject(self, connection, subject_name: str, career_id: int) -> Subject:
         """ Checks that the subject doesnt exist in the DB, if it does, it returns it """
-        subject = self.dao_subject.get_by_name(connection, subject_name)
+        subject = self.dao_subject.get_by_name_and_career_id(connection, subject_name, career_id)
         if not subject:
             return self.dao_subject.create(connection, Subject(name=subject_name, career_id=career_id))
         return subject
@@ -85,6 +86,50 @@ class CourseRepository:
         except (psycopg2.DatabaseError, psycopg2.IntegrityError) as db_error:
             connection.rollback()
             print(f"Database error occurred: {db_error}")
+            raise db_error
+        except Exception as e:
+            connection.rollback()
+            print(f"An unexpected error occurred creating courses: {e}")
+            raise e
+        finally:
+            self.db_manager.disconnect(connection)
+
+    def get_all_courses(self, skip: int = 0, limit: int = 10) -> List[CourseDTO]:
+        connection = self.db_manager.connect()
+        try:
+            with connection:
+                courses = self.dao_course.get_courses(connection, skip, limit)
+                coursesDTO = []
+                for course in courses:
+                    lead = self.dao_lead.get_lead_by_id(connection, course.lead_id)
+                    subject = self.dao_subject.get_by_id(connection, course.subject_id)
+                    career = self.dao_career.get_career_by_id(connection, subject.career_id)
+                    coursesDTO.append(CourseDTO(
+                        id=course.id,
+                        start_date=course.start_date,
+                        end_date=course.end_date,
+                        inscription_year=course.inscription_year,
+                        lead=LeadDTO(
+                            id=lead.id,
+                            name=lead.name,
+                            last_name=lead.last_name,
+                            email=lead.email,
+                            address=lead.address,
+                            phone=lead.phone
+                        ),
+                        subject=SubjectDTO(
+                            id=subject.id,
+                            name=subject.name,
+                            career=CareerDTO(
+                                id=career.id,
+                                name=career.name
+                            )
+                        )    
+                    ))
+                return coursesDTO
+        except (psycopg2.DatabaseError, psycopg2.IntegrityError) as db_error:
+            connection.rollback()
+            print(f"Database error occurred getting courses: {db_error}")
             raise db_error
         except Exception as e:
             connection.rollback()

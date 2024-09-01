@@ -5,9 +5,10 @@ CREATE TABLE Career (
 
 CREATE TABLE Subject (
     ID SERIAL PRIMARY KEY,
-    name VARCHAR(255) UNIQUE NOT NULL,
+    name VARCHAR(255) NOT NULL,
     career_id INT,
-    FOREIGN KEY (career_id) REFERENCES Career(ID)
+    FOREIGN KEY (career_id) REFERENCES Career(ID),
+    UNIQUE (name, career_id)
 );
 
 CREATE TABLE Lead (

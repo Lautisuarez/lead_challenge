@@ -10,7 +10,11 @@ class SubjectDAO(ABC):
         pass
 
     @abstractmethod
-    def get_by_name(self, connection, name: str) -> Subject:
+    def get_by_name_and_career_id(self, connection, name: str, career_id: int) -> Subject:
+        pass
+
+    @abstractmethod
+    def get_by_id(self, connection, id: int) -> Subject:
         pass
 
 class SubjectDAOPostgresql(SubjectDAO):
@@ -26,14 +30,24 @@ class SubjectDAOPostgresql(SubjectDAO):
         cursor.close()
         return subject
 
-    def get_by_name(self, connection, name: str) -> Subject:
+    def get_by_name_and_career_id(self, connection, name: str, career_id: int) -> Subject:
         cursor = connection.cursor(cursor_factory=RealDictCursor)
         cursor.execute("""
-        SELECT * FROM subject WHERE name = %s
-        """, (name,))
+        SELECT * FROM subject WHERE name = %s AND career_id = %s
+        """, (name,career_id,))
         subject_data = cursor.fetchone()
         cursor.close()
         if subject_data:
             return Subject(**subject_data)
         return None
         
+    def get_by_id(self, connection, id: int) -> Subject:
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
+        cursor.execute("""
+        SELECT * FROM subject WHERE id = %s
+        """, (id,))
+        subject_data = cursor.fetchone()
+        cursor.close()
+        if subject_data:
+            return Subject(**subject_data)
+        return None

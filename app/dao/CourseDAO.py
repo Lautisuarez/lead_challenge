@@ -1,11 +1,16 @@
 from app.models.Course import Course
 from abc import ABC, abstractmethod
 from psycopg2.extras import RealDictCursor
+from typing import List
 
 
 class CourseDAO(ABC):
     @abstractmethod
     def get_course_by_id(self, connection, course_id: str) -> Course:
+        pass
+
+    @abstractmethod
+    def get_courses(self, connection, skip: int = 0, limit: int = 10) -> List[Course]:
         pass
 
     @abstractmethod
@@ -22,6 +27,15 @@ class CourseDAOPostgresql(CourseDAO):
         cursor.close()
         if row:
             return Course(**row)
+        return None
+    
+    def get_courses(self, connection, skip: int = 0, limit: int = 10) -> List[Course]:
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
+        cursor.execute("SELECT * FROM course OFFSET %s LIMIT %s", (skip, limit,))
+        courses = cursor.fetchall()
+        cursor.close()
+        if courses:
+            return [Course(**course) for course in courses]
         return None
 
     def create(self, connection, course: Course) -> Course:

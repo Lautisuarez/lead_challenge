@@ -3,10 +3,14 @@ from app.models.Course import CourseDTO
 from app.models.Lead import LeadDTO
 from app.models.Subject import SubjectDTO
 from datetime import date
+from typing import List
 
 class CourseService:
     def __init__(self, repository: CourseRepository):
         self.repository = repository
+
+    def get_courses(self, skip: int = 0, limit: int = 10) -> List[CourseDTO]:
+        return self.repository.get_all_courses(skip, limit)
     
     def register_course_transaction(self, start_date: date, end_date: date, inscription_year: str, lead: LeadDTO, subject: SubjectDTO) -> CourseDTO:
         if not all([start_date, end_date, inscription_year, lead.name, lead.last_name, lead.email, subject.name, subject.career.name]):

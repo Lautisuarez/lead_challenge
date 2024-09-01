@@ -10,11 +10,11 @@ class LeadDAO(ABC):
         pass
 
     @abstractmethod
-    def get_all(self, connection, skip: int = 0, limit: int = 10) -> List[Lead]:
+    def get_lead_by_name(self, connection, name: str) -> Lead:
         pass
 
     @abstractmethod
-    def get_lead_by_name(self, connection, name: str) -> Lead:
+    def get_lead_by_id(self, connection, lead_id:int) -> Lead:
         pass
 
 
@@ -31,20 +31,22 @@ class LeadDAOPostgresql(LeadDAO):
         cursor.close()
         return lead
 
-    def get_all(self, connection, skip: int = 0, limit: int = 10) -> List[Lead]:
-        cursor = connection.cursor(cursor_factory=RealDictCursor)
-        cursor.execute("SELECT * FROM lead OFFSET %s LIMIT %s", (skip, limit,))
-        leads_data = cursor.fetchall()
-        cursor.close()
-        if leads_data:
-            return [Lead(**lead) for lead in leads_data]
-        return None
-
     def get_lead_by_name(self, connection, name: str) -> Lead:
         cursor = connection.cursor(cursor_factory=RealDictCursor)
         cursor.execute("""
         SELECT * FROM lead WHERE name = %s
         """, (name,))
+        lead_data = cursor.fetchone()
+        cursor.close()
+        if lead_data:
+            return Lead(**lead_data)
+        return None
+    
+    def get_lead_by_id(self, connection, lead_id: int) -> Lead:
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
+        cursor.execute("""
+        SELECT * FROM lead WHERE id = %s
+        """, (lead_id,))
         lead_data = cursor.fetchone()
         cursor.close()
         if lead_data:
