@@ -36,7 +36,7 @@ class CourseDAOPostgresql(CourseDAO):
         cursor.close()
         if courses:
             return [Course(**course) for course in courses]
-        return None
+        return []
 
     def create(self, connection, course: Course) -> Course:
         cursor = connection.cursor()

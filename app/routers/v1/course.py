@@ -58,9 +58,14 @@ def get_courses(skip: int = 0, limit: int = 10, service: CourseService = Depends
     **Return**: A list of courses.
     """
     try:
-        return service.get_courses(skip, limit)
+        courses = service.get_courses(skip, limit)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=f"Value Error: {e}")
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error Getting Courses: {e}")
+    if courses:
+        return courses
+    raise HTTPException(status_code=404, detail="There are no courses available.")
 
 @router.get("/{course_id}", response_model=CourseDTO, status_code=status.HTTP_200_OK)
 def get_course_by_id(course_id:str, service: CourseService = Depends(get_course_service)):
