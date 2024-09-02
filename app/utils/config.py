@@ -3,8 +3,12 @@ from pydantic_settings import BaseSettings
 from app.db import PostgreSQLManager
 
 config = Config(RepositoryEnv(".env"))
+config_version = Config(RepositoryEnv("VERSION"))
 
 class Settings(BaseSettings):
+    VERSION: str = config_version("VERSION", default="?.?.?")
+
+    # Database Config
     POSTGRES_USER: str = config("POSTGRES_USER", default="")
     POSTGRES_PSWD: str = config("POSTGRES_PSWD", default="")
     POSTGRES_URL: str = config("POSTGRES_URL", default="")

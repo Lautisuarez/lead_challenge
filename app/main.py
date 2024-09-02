@@ -1,8 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import api
+from app.utils.config import settings
 
-app = FastAPI(title=f"API Lead registration - Open Dev Challenge")
+app = FastAPI(
+    title=f"API Lead registration - Open Dev Challenge",
+    version=settings.VERSION
+)
 
 origins = ["http://localhost:8000"]
 
