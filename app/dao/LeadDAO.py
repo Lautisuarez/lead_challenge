@@ -10,7 +10,7 @@ class LeadDAO(ABC):
         pass
 
     @abstractmethod
-    def get_lead_by_name(self, connection, name: str) -> Lead:
+    def get_lead_by_email(self, connection, email: str) -> Lead:
         pass
 
     @abstractmethod
@@ -31,11 +31,11 @@ class LeadDAOPostgresql(LeadDAO):
         cursor.close()
         return lead
 
-    def get_lead_by_name(self, connection, name: str) -> Lead:
+    def get_lead_by_email(self, connection, email: str) -> Lead:
         cursor = connection.cursor(cursor_factory=RealDictCursor)
         cursor.execute("""
-        SELECT * FROM lead WHERE name = %s
-        """, (name,))
+        SELECT * FROM lead WHERE email = %s
+        """, (email,))
         lead_data = cursor.fetchone()
         cursor.close()
         if lead_data:

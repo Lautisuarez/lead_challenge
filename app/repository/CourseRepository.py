@@ -34,7 +34,7 @@ class CourseRepository:
 
     def _check_lead(self, connection, lead_dto: LeadDTO) -> Lead:
         """ Checks that the lead doesnt exist in the DB, if it does, it returns it """
-        lead = self.dao_lead.get_lead_by_name(connection, lead_dto.name)
+        lead = self.dao_lead.get_lead_by_email(connection, lead_dto.email)
         if not lead:
             return self.dao_lead.create(connection, Lead(
                 name=lead_dto.name,

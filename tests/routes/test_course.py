@@ -71,7 +71,7 @@ class MockCourseService:
         return data[skip:limit]
 
     def get_course_by_id(self, course_id):
-        if course_id == "not-found":
+        if course_id == "01ff5082-6ebr-2c4e-bb82-g7435bcqc345":
             return None
         if course_id == "invalid-id":
             raise ValueError("Invalid course ID format")
@@ -101,7 +101,7 @@ class MockCourseService:
 
 @pytest.fixture
 def override_dependency():
-    app.dependency_overrides[get_course_service] = lambda: MockCourseService()
+    app.dependency_overrides[get_course_service] = lambda: MockCourseService() # If you want to use the real database you must change it to the get_course_service() function
     yield
     app.dependency_overrides.clear()
 
@@ -169,9 +169,9 @@ class TestCourse():
         assert response.json()["id"] == "b10a365a-be0c-4c04-b168-7c392534685f"
 
     def test_get_course_by_id_not_found(self, override_dependency):
-        response = self.client.get("/api/v1/course/not-found", headers=self.headers)
+        response = self.client.get("/api/v1/course/01ff5082-6ebr-2c4e-bb82-g7435bcqc345", headers=self.headers)
         assert response.status_code == 404
-        assert response.json() == {"detail": "Course with ID: not-found not found"}
+        assert response.json() == {"detail": "Course with ID: 01ff5082-6ebr-2c4e-bb82-g7435bcqc345 not found"}
 
     def test_get_course_by_id_invalid(self, override_dependency):
         response = self.client.get("/api/v1/course/invalid-id", headers=self.headers)
