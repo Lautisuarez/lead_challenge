@@ -121,5 +121,5 @@ There are two types of tests implemented:
 
 ## Try App
 Try the app with the following links:
-[Lead Challenge](https://lead-challenge.onrender.com/)
-[Lead Challenge API](https://lead-challenge.onrender.com/docs)
+- <a href="https://lead-challenge.onrender.com/" target="_blank">Lead Challenge</a>
+- <a href="https://lead-challenge.onrender.com/docs" target="_blank">Lead Challenge API</a>
