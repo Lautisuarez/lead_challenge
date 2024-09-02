@@ -119,7 +119,7 @@ There are two types of tests implemented:
 1. Using a Mockup, which is currently implemented. Simply running the pytest command works.
 2. Using the database from the compose (real database). The instructions for running this are documented in the test_course.py file.
 
-## Try App 🔗
+## Try App
 Try the app with the following links:
 [Lead Challenge](https://lead-challenge.onrender.com/)
 [Lead Challenge API](https://lead-challenge.onrender.com/docs)
