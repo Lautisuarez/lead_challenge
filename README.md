@@ -90,7 +90,7 @@ Create a .env file in the root of the project with the following variables:
 ```
     POSTGRES_USER=admin
     POSTGRES_PSWD=admin
-    POSTGRES_URL=localhost
+    POSTGRES_URL=db
     POSTGRES_PORT=5432
     POSTGRES_DB=leadDB
 ```
