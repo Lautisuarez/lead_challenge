@@ -2,6 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.services.CourseService import CourseService
 from app.schemas.course import CourseCreate
 from app.models.Course import CourseDTO
+from app.models.Lead import LeadDTO
+from app.models.Subject import SubjectDTO
+from app.models.Career import CareerDTO
 from app.routers.dependencies import get_course_service
 from typing import List
 
@@ -24,8 +27,19 @@ def create_course(course: CourseCreate, service: CourseService = Depends(get_cou
             start_date=course.start_date,
             end_date=course.end_date,
             inscription_year=course.inscription_year,
-            lead=course.lead,
-            subject=course.subject
+            lead=LeadDTO(
+                name=course.lead.name,
+                last_name=course.lead.last_name,
+                email=course.lead.email,
+                address=course.lead.address,
+                phone=course.lead.phone
+            ),
+            subject=SubjectDTO(
+                name=course.subject.name,
+                career=CareerDTO(
+                    name=course.subject.career.name
+                )
+            )
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Value Error Creating Course: {e}")
